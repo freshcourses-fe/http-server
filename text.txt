@@ -1,0 +1,30 @@
+Client (Browser)
+ /\
+HTTP
+ \/
+Server 
+
+
+Client => Request => Server => Response => Client
+
+Request:
+METHOD URI версия протокола
+ЗАГОЛОВОК1:ЗНАЧЕНИЕ1
+Content-type: application/json
+
+ТЕЛО
+
+
+
+GET https://rozetka.com.ua/register
+
+POST https://rozetka.com.ua/register
+
+"{"login":user, "password": "user"}"
+
+Response:
+версия протокола STATUS-CODE STATUS-MESSAGE
+HEADER: VALUE
+HEADER: VALUE
+
+BODY
