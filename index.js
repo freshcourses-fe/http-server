@@ -1,42 +1,29 @@
-const http = require('http')
+const express = require('express')
 const fs = require('fs').promises
 const path = require('path')
+const app = express()
 
-function requestListener (req, res) {
-  if (req.method === 'GET') {
-    if (req.url === '/') {
-      fs.readFile(path.join(__dirname, 'view', 'index.html'), 'utf-8').then(
-        data => {
-          res.end(data)
-        }
-      )
-    } else {
-      fs.readFile(path.join(__dirname, 'view', '404.html'), 'utf-8').then(
-        data => {
-          res.end(data)
-        }
-      )
+app.get(
+  '/',
+  (req, res, next) => {
+    console.log('middleware')
+    if(true) {
+      next()
     }
-  } else if (req.method === 'POST') {
-    let string= ''
-    req.on('data', chunk => {
-      string += chunk
-    })
-
-    req.on('end', () => {
-      console.log(string)
-      const userData = JSON.parse(string)
-      userData.id = Date.now()
-
-      res.end(JSON.stringify(userData))
-    })
-
-    
+  },
+  (req, res, next) => {
+    fs.readFile(path.join(__dirname, 'view', 'index.html'), 'utf-8').then(
+      data => {
+        res.end(data)
+      }
+    )
   }
-}
+)
 
-const server = http.createServer(requestListener)
+// app.post('/', (req, res, next) => {
 
-server.listen(5000, () => {
-  console.log('hi')
+// })
+
+app.listen(5000, () => {
+  console.log('app is running')
 })
