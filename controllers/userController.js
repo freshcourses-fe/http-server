@@ -1,69 +1,59 @@
-let usersDb = [
-  { id: 1, name: 'Test', password: 'Test', login: 'Test' },
-  { id: 2, name: 'Test', password: 'Test', login: 'Test' }
-]
+const User = require('../models/User')
 
-module.exports.getUsers = (req, res) => {
-  res.send(usersDb)
+module.exports.getUsers = async (req, res) => {
+  const users = await User.getUsers()
+  res.send(users)
 }
 
-module.exports.getUser = (req, res) => {
-  const {
-    params: { userId }
-  } = req
+module.exports.getUser = async (req, res) => {
+  try {
+    const {
+      params: { userId }
+    } = req
+  
+  const user = await User.getUser(userId)
 
-  const foundUser = usersDb.find(user => user.id === Number(userId))
-  if (foundUser) {
-    return res.send(foundUser)
+  res.send(user)
+
+  } catch (error) {
+    res.status(404).send({ message: error.message })
   }
-
-  res.status(404).send({ message: 'User not Found' })
 }
 
-module.exports.createUser = (req, res) => {
-  const user = req.body
-  console.log(user)
-
-  user.id = Date.now()
-
-  usersDb.push(user)
+module.exports.createUser = async (req, res) => {
+  const user = await User.createUser(req.body)
 
   res.send(user)
 }
 
-module.exports.updateUser = (req, res) => {
-  const {
-    params: { userId },
-    body: newUser
-  } = req
+module.exports.updateUser = async (req, res) => {
+  try {
+    const {
+      params: { userId },
+      body: newUser
+    } = req
 
-  const foundUserIndex = usersDb.findIndex(user => user.id === Number(userId))
+    const updatedUser = await User.updateUser({
+      id: userId,
+      newValues: newUser
+    })
 
-  if (foundUserIndex === -1) {
-    return res.status(404).send({ message: 'User not found' })
+    res.send(updatedUser)
+  } catch (error) {
+    res.status(404).send({ message: error.message })
   }
-
-  usersDb = usersDb.map((user, index) => {
-    const isSameUser = index === foundUserIndex
-
-    return isSameUser ? { ...user, ...newUser } : user
-  })
-
-  res.send(usersDb[foundUserIndex])
 }
 
-module.exports.deleteUser = (req, res) => {
-  const {
-    params: { userId }
-  } = req
+module.exports.deleteUser = async (req, res) => {
+  try {
+    const {
+      params: { userId }
+    } = req
 
-  const deletedUser = usersDb.find(user => user.id === Number(userId))
+    const deletedId = await User.deleteUser(userId)
 
-  if (!deletedUser) {
-    return res.status(404).send({ message: 'User not found' })
+    res.send({ id: deletedId })
+  } catch (error) {
+    res.status(404).send({ message: error.message })
   }
-
-  usersDb = usersDb.filter(user => user.id !== Number(userId))
-
-  res.send({ id: userId })
 }
